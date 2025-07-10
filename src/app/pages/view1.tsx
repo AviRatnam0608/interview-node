@@ -7,8 +7,13 @@ import {
 } from "@/app/interfaces/interface";
 import Chatbox from "@/app/widgets/chatbox";
 import React, { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import type { ForceGraphMethods } from "react-force-graph-2d";
-import ForceGraph2D from "react-force-graph-2d";
+
+// Use Next.js dynamic import with ssr: false for ForceGraph2D to prevent SSR/prerender errors related to window usage in this library.
+const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
+  ssr: false,
+});
 
 export const MainView: React.FC = () => {
   const fgRef = useRef<ForceGraphMethods>(undefined);
@@ -33,8 +38,8 @@ export const MainView: React.FC = () => {
     }
     if (typeof window !== "undefined") {
       updateDimensions();
-      window.addEventListener("resize", updateDimensions);
-      return () => window.removeEventListener("resize", updateDimensions);
+      // window.addEventListener("resize", updateDimensions);
+      // return () => window.removeEventListener("resize", updateDimensions);
     }
     // On server, do nothing
     return () => {};
