@@ -1,0 +1,39 @@
+[
+  {
+    "name": "create_entity",
+    "description": "Create a new entity node",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "props": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["name", "type"]
+    }
+  },
+  {
+    "name": "update_entity",
+    "description": "Update properties of an existing entity",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "guid": { "type": "string" },
+        "name": { "type": "string" },
+        "props": { "type": "object", "additionalProperties": true }
+      },
+      "required": ["guid"]
+    }
+  },
+  {
+    "name": "delete_entity",
+    "description": "Remove an entity node by GUID",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "guid": { "type": "string" }
+      },
+      "required": ["guid"]
+    }
+  }
+]

@@ -107,7 +107,10 @@ export const MainView = () => {
     <div>
       <div className="flex h-96">
         <div className="w-1/2 m-2">
-          <Chatbox />
+          <Chatbox
+            entities={[entityType || "component", "tool"]}
+            relations={[relationType || "tests", "secures", "monitors"]}
+          />
         </div>
         <div className="w-1/2 h-full pl-4 flex flex-col border-1 rounded-lg m-2">
           <div ref={containerRef} className="flex-1">
