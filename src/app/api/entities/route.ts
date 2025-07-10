@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 import { Entity } from "@/app/interfaces/interface";
@@ -72,6 +72,7 @@ export async function GET() {
 
     return NextResponse.json({ entities: allEntities });
   } catch (e) {
+    console.error(e);
     return NextResponse.json(
       { error: "Failed to load entities" },
       { status: 500 }
