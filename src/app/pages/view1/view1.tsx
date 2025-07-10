@@ -105,12 +105,10 @@ export const MainView = () => {
   return (
     <div>
       <div className="flex h-96">
-        {/* Left side: Chatbox area (blank for now) */}
         <div className="w-1/2 m-2">
           <Chatbox />
         </div>
-        {/* Right side: Graph area */}
-        <div className="w-1/2 pl-4 flex flex-col border-1 rounded-lg m-2">
+        <div className="w-1/2 h-full pl-4 flex flex-col border-1 rounded-lg m-2">
           <div ref={containerRef} className="flex-1">
             <ForceGraph2D
               ref={fgRef}
@@ -175,7 +173,6 @@ export const MainView = () => {
           Fetch Entities
         </button>
       </div>
-      {/* Display results */}
       <div className="mt-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="p-2">
