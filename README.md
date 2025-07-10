@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+We have multiple CSV files -> Determine the type of the Entity based on the file names.
 
-## Getting Started
+JSON files -> Meta data about the nodes (ignore for now)
+Archive files -> (ignore for now)
 
-First, run the development server:
+CSV files prefixed with relation\_ -> determine the relation between nodes (either within the entity, or across entities).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+For a given entity/ relation:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- any keys with the prefix spec\_ -> are custom/ for a given entity
+- other keys are common across all entities.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+One endpoint that takes in 2 (or more) entities, and give it a relation name. -> returns all entities.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Basic:
+Entities: component, tool
+Relation: tests
 
-## Learn More
+We want 2 views:
+View 1:
+Entity: component, tool (types of the entity)
+Relation: tests, secures, monitors (between the above entities)
 
-To learn more about Next.js, take a look at the following resources:
+View 2
+Entity: component, artifact, resource, environment (types of the entity)
+Relation: deployed_in, deployed_to, package (between the above entities)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+View layout:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Graph o/p
+- Chat area that you provide instructions through (uses some LLM).
 
-## Deploy on Vercel
+Plan:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Import our data -> into some DB
+2. Create basic CRUD op functions
+3. Create API end-points that consume these CRUD functionality + business logic
+4. Create front-end views, that allow the user to choose between view 1 or 2.
