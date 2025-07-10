@@ -94,6 +94,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { entities, relations } = body;
 
+    // Normalize relation types: split any comma-separated strings into individual types
+    const relationTypes: string[] = Array.isArray(relations)
+      ? relations.flatMap((r) => r.split(",").map((s: string) => s.trim()))
+      : [];
+
     console.log("Received entities:", entities);
     console.log("Received relations:", relations);
 
@@ -134,7 +139,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Process each relation type
-    for (const relationType of relations) {
+    for (const relationType of relationTypes) {
       try {
         const relationFilePath = getRelationFilePath(relationType);
         console.log(`Loading relation file: ${relationFilePath}`);
@@ -156,11 +161,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Filter relations by requested types (OR semantics) using normalized relationTypes (substring match)
+    const matchedRelations =
+      relationTypes.length > 0
+        ? allRelations.filter((r) =>
+            relationTypes.some((rt) => r.type.includes(rt))
+          )
+        : allRelations;
+
     // Find related entities based on relations
     const relatedEntityGuids = new Set<string>();
 
     // Add source and target entities from relations
-    for (const relation of allRelations) {
+    for (const relation of matchedRelations) {
       relatedEntityGuids.add(relation.source);
       relatedEntityGuids.add(relation.target);
     }
@@ -173,16 +186,16 @@ export async function POST(req: NextRequest) {
     // If no relations were found, return all entities of the requested types
     // This handles the case where we want to see all entities of certain types
     const finalEntities =
-      allRelations.length > 0 ? relatedEntities : allEntities;
+      matchedRelations.length > 0 ? relatedEntities : allEntities;
 
     console.log(`Found ${relatedEntities.length} related entities`);
-    console.log(`Found ${allRelations.length} relations`);
+    console.log(`Found ${matchedRelations.length} relations`);
     console.log(`Returning ${finalEntities.length} entities`);
     console.log(`Related entity GUIDs:`, Array.from(relatedEntityGuids));
 
     return NextResponse.json({
       entities: finalEntities,
-      relations: allRelations,
+      relations: matchedRelations,
     });
   } catch (e) {
     console.error("Error in POST handler:", e);

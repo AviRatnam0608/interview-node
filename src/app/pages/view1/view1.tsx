@@ -170,7 +170,7 @@ export const MainView = () => {
               relationsType: [relationType],
             })
           }
-          className="bg-blue-500 text-white p-2 rounded"
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-800 hover:cursor-pointer"
         >
           Fetch Entities
         </button>
