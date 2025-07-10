@@ -184,7 +184,8 @@ export const MainView: React.FC = () => {
               relationsType: [relationType],
             })
           }
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-800 hover:cursor-pointer"
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-800 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!entityType.trim() || !relationType.trim()}
         >
           Fetch Entities
         </button>
