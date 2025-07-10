@@ -6,11 +6,11 @@ import {
   Relation,
 } from "@/app/interfaces/interface";
 import Chatbox from "@/app/widgets/chatbox";
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { ForceGraphMethods } from "react-force-graph-2d";
 import ForceGraph2D from "react-force-graph-2d";
 
-export const MainView = () => {
+export const MainView: React.FC = () => {
   const fgRef = useRef<ForceGraphMethods>(undefined);
 
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -31,9 +31,13 @@ export const MainView = () => {
         });
       }
     }
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
+    if (typeof window !== "undefined") {
+      updateDimensions();
+      window.addEventListener("resize", updateDimensions);
+      return () => window.removeEventListener("resize", updateDimensions);
+    }
+    // On server, do nothing
+    return () => {};
   }, []);
 
   // Build graph data ensuring all referenced nodes exist
@@ -49,6 +53,7 @@ export const MainView = () => {
       id,
       name: entity?.name ?? id,
       type: entity?.type ?? "unknown",
+      label: entity?.name ?? id,
     };
   });
 
@@ -56,7 +61,7 @@ export const MainView = () => {
 
   const graphData = { nodes, links };
 
-  const fetchAllEntities = async () => {
+  const fetchAllEntities = async (): Promise<void> => {
     fetch("/api/entities")
       .then((response) => response.json())
       .then((data) => {
@@ -79,7 +84,9 @@ export const MainView = () => {
       .catch((error) => console.error("Error fetching entities:", error));
   };
 
-  const fetchEntities = async (entitiesReq: EntityGraphRequest) => {
+  const fetchEntities = async (
+    entitiesReq: EntityGraphRequest
+  ): Promise<void> => {
     if (!entitiesReq.entitiesType || !entitiesReq.relationsType) {
       return fetchAllEntities();
     }
@@ -117,7 +124,7 @@ export const MainView = () => {
             <ForceGraph2D
               ref={fgRef}
               graphData={graphData}
-              nodeLabel="name"
+              nodeLabel="label"
               nodeAutoColorBy="type"
               nodeRelSize={10}
               linkDirectionalArrowLength={3}

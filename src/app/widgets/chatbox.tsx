@@ -1,12 +1,13 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
-const Chatbox = ({
-  entities,
-  relations,
-}: {
+import React, { useState } from "react";
+
+interface ChatboxProps {
   entities: string[];
   relations: string[];
-}) => {
+}
+
+const Chatbox: React.FC<ChatboxProps> = ({ entities, relations }) => {
   const [messages, setMessages] = useState([
     {
       role: "system",
@@ -18,7 +19,7 @@ const Chatbox = ({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const sendMessage = async () => {
+  const sendMessage = async (): Promise<void> => {
     if (!input.trim()) return;
     const newMessages = [...messages, { role: "user", content: input }];
     setMessages(newMessages);
