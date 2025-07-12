@@ -36,3 +36,13 @@ Plan:
 2. Create basic CRUD op functions
 3. Create API end-points that consume these CRUD functionality + business logic
 4. Create front-end views, that allow the user to choose between view 1 or 2.
+
+Plan for LLM Integration:
+
+1. Create a chat interface which is:
+   a. Aware of the entities and relations
+   b. Can take user input and convert it into a query which acts on the entities and relations.
+2. Use the LLM to process the user input to either:
+   a. Update Entity node(s) -> By name or guid
+   b. Delete Entity node
+   c. Create Entity node
