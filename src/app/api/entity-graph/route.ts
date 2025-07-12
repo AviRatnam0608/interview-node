@@ -88,6 +88,47 @@ function csvToRelation(csvData: Record<string, string>): Relation {
   };
 }
 
+// Given a list of relations and a list of entity types, return all unique Entity objects referenced by the relations
+async function getEntitiesForRelations(
+  relations: Relation[],
+  entityTypes: string[]
+): Promise<Entity[]> {
+  const entityFiles: Entity[] = [];
+  const processedEntityTypes = new Set<string>();
+
+  // Load all entities for the given types
+  for (const entityTypeRaw of entityTypes) {
+    // Split by comma and trim, in case a string like "component, tool" is passed
+    const splitTypes = entityTypeRaw
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    for (const entityType of splitTypes) {
+      if (processedEntityTypes.has(entityType)) continue;
+      processedEntityTypes.add(entityType);
+      try {
+        const entityFilePath = getEntityFilePath(entityType);
+        const entityData = await fs.readFile(entityFilePath, "utf-8");
+        const entityCsvData = parseCSV(entityData);
+        const entitiesOfType = entityCsvData.map(csvToEntity);
+        entityFiles.push(...entitiesOfType);
+      } catch (error) {
+        console.warn(`Could not load entity type ${entityType}:`, error);
+      }
+    }
+  }
+
+  // Build a set of all guids referenced in the relations
+  const guids = new Set<string>();
+  for (const rel of relations) {
+    if (rel.source) guids.add(rel.source);
+    if (rel.target) guids.add(rel.target);
+  }
+
+  // Return all unique Entity objects referenced by the relations
+  return entityFiles.filter((entity) => guids.has(entity.guid));
+}
+
 // POST endpoint to accept a list of entities and relations, and return related entities
 export async function POST(req: NextRequest) {
   try {
@@ -169,29 +210,11 @@ export async function POST(req: NextRequest) {
           )
         : allRelations;
 
-    // Find related entities based on relations
-    const relatedEntityGuids = new Set<string>();
-
-    // Add source and target entities from relations
-    for (const relation of matchedRelations) {
-      relatedEntityGuids.add(relation.source);
-      relatedEntityGuids.add(relation.target);
-    }
-
-    // Filter entities to only include those that are part of the relations
-    const relatedEntities = allEntities.filter((entity) =>
-      relatedEntityGuids.has(entity.guid)
+    // Use the helper to get all unique entities referenced by the matched relations
+    const finalEntities = await getEntitiesForRelations(
+      matchedRelations,
+      entities
     );
-
-    // If no relations were found, return all entities of the requested types
-    // This handles the case where we want to see all entities of certain types
-    const finalEntities =
-      matchedRelations.length > 0 ? relatedEntities : allEntities;
-
-    console.log(`Found ${relatedEntities.length} related entities`);
-    console.log(`Found ${matchedRelations.length} relations`);
-    console.log(`Returning ${finalEntities.length} entities`);
-    console.log(`Related entity GUIDs:`, Array.from(relatedEntityGuids));
 
     return NextResponse.json({
       entities: finalEntities,

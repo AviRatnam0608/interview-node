@@ -20,6 +20,9 @@ export const MainView: React.FC = () => {
 
   const [entities, setEntities] = useState<Entity[]>([]);
   const [relations, setRelations] = useState<Relation[]>([]);
+  // const [relatedEntities, setRelatedEntities] = useState<Set<string>>(
+  //   new Set<string>()
+  // );
   const [entityType, setEntityType] = useState<string>("");
   const [relationType, setRelationType] = useState<string>("");
 
@@ -106,10 +109,20 @@ export const MainView: React.FC = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        // data.entities will be your filtered/custom entities
         setEntities(data.entities || []);
         setRelations(data.relations || []);
-        console.log("Fetched custom entities:", data.entities);
+        // Build a map of unique related entities from the relations' source/target GUIDs
+        // const entitySet = new Set<string>();
+        // (data.relations || []).forEach((relation: Relation) => {
+        //   console.log(relation, relation.source, relation.target);
+
+        //   entitySet.add(relation.source);
+        //   entitySet.add(relation.target);
+        // });
+        // console.log(entitySet);
+        // setRelatedEntities(entitySet);
+        // console.log("Fetched custom entities:", entitySet);
+        console.log("Fetched custom entities 2:", data.entities);
         console.log("Fetched relations:", data.relations);
       })
       .catch((error) => console.error("Error fetching entities:", error));
@@ -192,6 +205,25 @@ export const MainView: React.FC = () => {
       </div>
       <div className="mt-6">
         <div className="grid grid-cols-2 gap-4">
+          <div className="p-2">
+            <h4 className="font-medium mb-2">
+              Related Entities ({entities.length}):
+            </h4>
+            <div className="max-h-60 overflow-y-auto border rounded p-2">
+              {entities.map((entity) => (
+                <div
+                  key={entity.guid}
+                  className="text-sm mb-1 p-1 bg-gray-700 rounded"
+                >
+                  <strong>{entity.name}</strong>
+                  <br />
+                  <span className="text-xs text-gray-400">
+                    {entity.type} ({entity.guid})
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className="p-2">
             <h4 className="font-medium mb-2">
               Relations ({relations.length}):
